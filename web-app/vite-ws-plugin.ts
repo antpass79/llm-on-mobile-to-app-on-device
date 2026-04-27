@@ -37,12 +37,18 @@ export function wsServerPlugin(): Plugin {
     configureServer(server) {
       wss = new WebSocketServer({ port: WS_PORT });
 
-      wss.on('connection', (ws) => {
+      wss.on('connection', (ws, req) => {
+        console.log(`[WS] +client from ${req.socket.remoteAddress}  total=${wss!.clients.size}`);
+        ws.on('close', () => {
+          console.log(`[WS] -client  total=${wss!.clients.size}`);
+        });
         ws.on('message', (data) => {
+          const text = data.toString();
+          console.log(`[WS] msg from ${req.socket.remoteAddress}: ${text.slice(0, 200)}`);
           // Relay to every OTHER connected client — no echo back to sender.
           wss!.clients.forEach((client) => {
             if (client !== ws && client.readyState === 1 /* OPEN */) {
-              client.send(data);
+              client.send(text);
             }
           });
         });

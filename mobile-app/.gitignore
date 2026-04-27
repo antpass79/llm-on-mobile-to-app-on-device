@@ -1,0 +1,6 @@
+# Local environment and machine-specific files
+/local.properties
+/.gradle
+/captures
+/build
+/app/build

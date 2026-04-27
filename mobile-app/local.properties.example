@@ -1,0 +1,10 @@
+# Android SDK path is required by Android Studio/Gradle on each developer machine
+# sdk.dir=C:\\Users\\<user>\\AppData\\Local\\Android\\Sdk
+
+# WebSocket endpoint used by the Android app to send/receive image parameters
+WS_URL=ws://10.0.2.2:8080
+
+# Azure OpenAI settings (do not commit real credentials)
+LLM_URL=https://ent-poc-openai-gpt4-o.openai.azure.com
+LLM_KEY=<your-azure-openai-key>
+LLM_MODEL=ENT-POC-OpenAI-GPT4-O

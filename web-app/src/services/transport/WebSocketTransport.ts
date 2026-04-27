@@ -30,11 +30,23 @@ export class WebSocketTransport implements ITransport {
     };
 
     this.ws.onmessage = (event: MessageEvent) => {
-      try {
-        const message = JSON.parse(event.data as string) as ParameterMessage;
-        this.messageCallback?.(message);
-      } catch {
-        console.error('Failed to parse WebSocket message:', event.data);
+      const handle = (text: string) => {
+        try {
+          const message = JSON.parse(text) as ParameterMessage;
+          this.messageCallback?.(message);
+        } catch {
+          console.error('Failed to parse WebSocket message:', text);
+        }
+      };
+      const data: unknown = event.data;
+      if (typeof data === 'string') {
+        handle(data);
+      } else if (data instanceof Blob) {
+        data.text().then(handle);
+      } else if (data instanceof ArrayBuffer) {
+        handle(new TextDecoder().decode(data));
+      } else {
+        console.error('Failed to parse WebSocket message:', data);
       }
     };
   }
@@ -48,6 +60,8 @@ export class WebSocketTransport implements ITransport {
   send(message: ParameterMessage): void {
     if (this.ws?.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(message));
+    } else {
+      console.warn('[WS] send dropped, readyState=', this.ws?.readyState, message);
     }
   }
 
