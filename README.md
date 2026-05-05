@@ -48,14 +48,18 @@ sdk.dir=C:\Users\<user>\AppData\Local\Android\Sdk
 # Use 10.0.2.2 for the Android emulator (maps to host loopback)
 WS_URL=ws://10.0.2.2:8080
 
-# Azure OpenAI credentials
-LLM_URL=https://<your-resource>.openai.azure.com
-LLM_KEY=<your-azure-openai-key>
-LLM_MODEL=<deployment-name>
+# Google Gemini API key
+GEMINI_KEY=<your-gemini-api-key>
 ```
 
-`WS_URL` is injected at build time via `BuildConfig.WS_URL` (see `mobile-app/app/build.gradle.kts`).  
-The default fallback when the property is absent is `ws://10.0.2.2:8080`.
+##### Getting a Gemini API key
+
+1. Go to **[aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)** (free Google account required)
+2. Click **Create API key** and select or create a project
+3. Copy the generated key (`AIza...`)
+4. Paste it as `GEMINI_KEY=AIza...` in `local.properties`
+
+The key is injected at build time via `BuildConfig.GEMINI_KEY` (see `mobile-app/app/build.gradle.kts`) and never leaves the device — it is only used to call the Gemini REST API directly from the app.
 
 | Scenario | `WS_URL` value |
 |---|---|

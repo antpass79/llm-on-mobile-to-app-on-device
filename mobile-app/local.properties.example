@@ -4,7 +4,6 @@
 # WebSocket endpoint used by the Android app to send/receive image parameters
 WS_URL=ws://10.0.2.2:8080
 
-# Azure OpenAI settings (do not commit real credentials)
-LLM_URL=https://ent-poc-openai-gpt4-o.openai.azure.com
-LLM_KEY=<your-azure-openai-key>
-LLM_MODEL=ENT-POC-OpenAI-GPT4-O
+# Google Gemini API key (do not commit real credentials)
+# Obtain from https://aistudio.google.com/app/apikey
+GEMINI_KEY=<your-google-gemini-api-key>

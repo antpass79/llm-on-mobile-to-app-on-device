@@ -34,9 +34,10 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "WS_URL", "\"${localProperty("WS_URL", "ws://10.0.2.2:8080")}\"")
-        buildConfigField("String", "LLM_URL", "\"${localProperty("LLM_URL", "")}\"")
-        buildConfigField("String", "LLM_KEY", "\"${localProperty("LLM_KEY", "")}\"")
-        buildConfigField("String", "LLM_MODEL", "\"${localProperty("LLM_MODEL", "")}\"")
+        buildConfigField("String", "GEMINI_KEY", "\"${localProperty("GEMINI_KEY", "")}\"")
+        buildConfigField("String", "AZURE_URL", "\"${localProperty("AZURE_URL", "")}\"")
+        buildConfigField("String", "AZURE_KEY", "\"${localProperty("AZURE_KEY", "")}\"")
+        buildConfigField("String", "AZURE_MODEL", "\"${localProperty("AZURE_MODEL", "")}\"")
     }
 
     buildTypes {
@@ -75,6 +76,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3:1.3.1")
+    implementation("androidx.compose.material:material-icons-extended")
     implementation("com.google.android.material:material:1.12.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")

@@ -8,12 +8,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.esaote.imageparams.config.AppConfig
 import com.esaote.imageparams.network.AzureOpenAiClient
 import com.esaote.imageparams.network.WebSocketParameterClient
 import com.esaote.imageparams.speech.VoiceInputManager
 import com.esaote.imageparams.ui.MainScreen
 import com.esaote.imageparams.viewmodel.MainViewModel
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 
@@ -24,9 +28,10 @@ class MainActivity : ComponentActivity() {
     private val microphonePermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (granted) {
-                startVoiceCapture()
+                voiceInputManager.setEnabled(true)
             } else {
                 Toast.makeText(this, "Microphone permission denied", Toast.LENGTH_SHORT).show()
+                viewModel.setMicEnabled(false)
             }
         }
 
@@ -43,36 +48,43 @@ class MainActivity : ComponentActivity() {
         val llmClient = AzureOpenAiClient(
             httpClient = client,
             json = json,
-            endpoint = AppConfig.llmUrl,
-            apiKey = AppConfig.llmKey,
-            deployment = AppConfig.llmModel,
+            endpoint = AppConfig.azureUrl,
+            apiKey = AppConfig.azureKey,
+            deployment = AppConfig.azureModel,
         )
 
-        voiceInputManager = VoiceInputManager(this)
+        voiceInputManager = VoiceInputManager(
+            context = this,
+            onPartialResult = { text -> viewModel.onPartialTranscript(text) },
+            onFinalResult = { transcript -> viewModel.onFinalTranscript(transcript) },
+            onError = { error -> Toast.makeText(this, error, Toast.LENGTH_SHORT).show() },
+        )
+
         viewModel = MainViewModel(socketClient, llmClient)
 
+        // React to mic toggle: request permission if needed, then enable/disable the manager.
+        lifecycleScope.launch {
+            viewModel.uiState
+                .map { it.isMicEnabled }
+                .distinctUntilChanged()
+                .collect { enabled ->
+                    if (enabled) requestMicrophoneAndStart() else voiceInputManager.setEnabled(false)
+                }
+        }
+
         setContent {
-            MainScreen(
-                viewModel = viewModel,
-                defaultWsUrl = AppConfig.wsUrl,
-                onVoiceClick = { requestVoiceInput() },
-            )
+            MainScreen(viewModel = viewModel, defaultWsUrl = AppConfig.wsUrl)
         }
     }
 
-    private fun requestVoiceInput() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-            startVoiceCapture()
+    private fun requestMicrophoneAndStart() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            voiceInputManager.setEnabled(true)
         } else {
             microphonePermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
         }
-    }
-
-    private fun startVoiceCapture() {
-        voiceInputManager.listen(
-            onResult = { transcript -> viewModel.processVoiceTranscript(transcript) },
-            onError = { error -> Toast.makeText(this, error, Toast.LENGTH_SHORT).show() },
-        )
     }
 
     override fun onDestroy() {
@@ -80,3 +92,4 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
     }
 }
+
