@@ -16,7 +16,7 @@ enum class MessageType {
 data class ParameterPayload(
     val gain: Int? = null,
     val depth: Int? = null,
-    val zoom: Double? = null,
+    val zoom: Int? = null,
 )
 
 @Serializable

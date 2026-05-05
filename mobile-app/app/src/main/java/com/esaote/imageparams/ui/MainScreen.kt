@@ -70,7 +70,7 @@ fun MainScreen(
             Text("Last voice: ${uiState.lastTranscript}")
         }
 
-        ParameterSliderInt(
+        ParameterSlider(
             title = "Gain",
             value = uiState.parameters.gain,
             min = 0f,
@@ -78,7 +78,7 @@ fun MainScreen(
             onValueChange = { viewModel.updateGain(it) }
         )
 
-        ParameterSliderInt(
+        ParameterSlider(
             title = "Depth",
             value = uiState.parameters.depth,
             min = 0f,
@@ -86,12 +86,11 @@ fun MainScreen(
             onValueChange = { viewModel.updateDepth(it) }
         )
 
-        ParameterSliderDouble(
+        ParameterSlider(
             title = "Zoom",
             value = uiState.parameters.zoom,
             min = 1f,
             max = 10f,
-            step = 0.5f,
             onValueChange = { viewModel.updateZoom(it) }
         )
 
@@ -101,7 +100,7 @@ fun MainScreen(
 }
 
 @Composable
-private fun ParameterSliderInt(
+private fun ParameterSlider(
     title: String,
     value: Int,
     min: Float,
@@ -118,31 +117,6 @@ private fun ParameterSliderInt(
             onValueChange = { localValue = it },
             onValueChangeFinished = { onValueChange(localValue.toInt()) },
             valueRange = min..max,
-        )
-    }
-}
-
-@Composable
-private fun ParameterSliderDouble(
-    title: String,
-    value: Double,
-    min: Float,
-    max: Float,
-    step: Float,
-    onValueChange: (Double) -> Unit,
-) {
-    var localValue by remember(value) { mutableStateOf(value.toFloat()) }
-    val steps = (((max - min) / step).toInt() - 1).coerceAtLeast(0)
-
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text("$title: %.1f".format(value))
-        Slider(
-            modifier = Modifier.fillMaxWidth(),
-            value = localValue,
-            onValueChange = { localValue = it },
-            onValueChangeFinished = { onValueChange(localValue.toDouble()) },
-            valueRange = min..max,
-            steps = steps,
         )
     }
 }

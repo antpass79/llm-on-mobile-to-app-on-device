@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class ImageParameters(
     val gain: Int = 50,
     val depth: Int = 100,
-    val zoom: Double = 1.0,
+    val zoom: Int = 1,
 )

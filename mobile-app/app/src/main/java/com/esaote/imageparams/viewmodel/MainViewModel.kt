@@ -55,7 +55,7 @@ class MainViewModel(
         updateAndSend(ParameterPayload(depth = depth))
     }
 
-    fun updateZoom(zoom: Double) {
+    fun updateZoom(zoom: Int) {
         updateAndSend(ParameterPayload(zoom = zoom))
     }
 
